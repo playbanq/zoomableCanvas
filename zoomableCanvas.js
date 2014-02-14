@@ -15,8 +15,16 @@ function zoomableCanvas(canvas) {
     }
 
     // The zoom ratio
-    var zoom = 1,
-        zoomSpeed = 1;
+    var zoom = {
+        scale: 1,
+        speed: 1,
+        keys: { // i, o
+            'in': 73,
+            'out': 79
+        },
+        'in': false,
+        'out': false
+    };
 
     var properties = {
         zoomOut: {
@@ -42,6 +50,32 @@ function zoomableCanvas(canvas) {
             }
         }
     };
+
+    // Zoom key handling
+    // On 'keydown' events
+    var zoomInPressed, zoomOutPressed
+    document.addEventListener('keydown', function (event) {
+        var keyCode = event.keyCode;
+        if (!zoom.in && zoom.keys['in'] == keyCode) {
+            zoom.in = true;
+        } else if (!zoom.out && zoom.keys['out'] == keyCode) {
+            zoom.out = true;
+        }
+    });
+
+    // On 'keyup' events
+    document.addEventListener('keyup', function () {
+        var keyCode = event.keyCode;
+        if (zoom.in && zoom.keys['in'] == keyCode) {
+            zoom.in = false;
+        } else if (zoom.out && zoom.keys['out'] == keyCode) {
+            zoom.out = false;
+        }
+    });
+
+    window.addEventListener('scroll', function () {
+        console.log('scroll');
+    });
 
     Object.defineProperties(canvas, properties);
     
