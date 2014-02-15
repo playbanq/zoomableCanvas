@@ -17,7 +17,7 @@ function zoomableCanvas(canvas) {
     // The zoom ratio
     var zoom = {
         scale: 1,
-        speed: 1,
+        speed: 1.02,
         keys: { // i, o
             'in': 73,
             'out': 79
@@ -27,7 +27,10 @@ function zoomableCanvas(canvas) {
     };
 
     var properties = {
-        zoomOut: {
+        zoom: {
+            value: zoom,
+        },
+        zoomIn: {
             value: function () {
 
             }
@@ -53,25 +56,33 @@ function zoomableCanvas(canvas) {
 
     // Zoom key handling
     // On 'keydown' events
-    var zoomInPressed, zoomOutPressed
-    document.addEventListener('keydown', function (event) {
-        var keyCode = event.keyCode;
-        if (!zoom.in && zoom.keys['in'] == keyCode) {
-            zoom.in = true;
-        } else if (!zoom.out && zoom.keys['out'] == keyCode) {
-            zoom.out = true;
-        }
-    });
-
-    // On 'keyup' events
-    document.addEventListener('keyup', function () {
-        var keyCode = event.keyCode;
-        if (zoom.in && zoom.keys['in'] == keyCode) {
-            zoom.in = false;
-        } else if (zoom.out && zoom.keys['out'] == keyCode) {
-            zoom.out = false;
-        }
-    });
+    if (typeof KeyboardEvents === 'object') {
+        var keyboard = new KeyboardEvents.emitter(),
+            zoomTemp;
+        keyboard.on('in', 73, {
+            'onkeyhold': function (delta) {
+                zoomTemp = zoom.scale * (zoom.speed); // + delta) / delta;
+                zoom.scale = zoomTemp;
+            }
+        });
+        keyboard.on('out', 79, {
+            'onkeyhold': function (delta) {
+                zoomTemp = zoom.scale / (zoom.speed); // + delta) / delta;
+                if (canvas.width/zoomTemp <= Math.abs(canvas.grid.right - canvas.grid.left) &&
+                    canvas.height/zoomTemp <= Math.abs(canvas.grid.bottom - canvas.grid.top)) {
+                    zoom.scale = zoomTemp;
+                    var offset = canvas.width/zoom.scale + canvas.grid.offset.left;
+                    if (offset > canvas.grid.right) {
+                        canvas.grid.offset.left = canvas.grid.right - canvas.width/zoom.scale;
+                    }
+                    offset = canvas.height/zoom.scale + canvas.grid.offset.top;
+                    if (offset > canvas.grid.bottom) {
+                        canvas.grid.offset.top = canvas.grid.bottom - canvas.height/zoom.scale;
+                    }
+                }   
+            }
+        });
+    }
 
     window.addEventListener('scroll', function () {
         console.log('scroll');
