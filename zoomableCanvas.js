@@ -61,8 +61,17 @@ function zoomableCanvas(canvas) {
             zoomTemp;
         keyboard.on('in', 73, {
             'onkeyhold': function (delta) {
+                var width = canvas.width/zoom.scale,
+                    height = canvas.height/zoom.scale;
+                
                 zoomTemp = zoom.scale * (zoom.speed); // + delta) / delta;
                 zoom.scale = zoomTemp;
+
+                var newWidth = canvas.width/zoom.scale,
+                    newHeight = canvas.height/zoom.scale;
+                    
+                canvas.grid.offset.left += (width - newWidth)/2;
+                canvas.grid.offset.top += (height - newHeight)/2;
             }
         });
         keyboard.on('out', 79, {
