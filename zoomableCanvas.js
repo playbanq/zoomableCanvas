@@ -69,24 +69,37 @@ function zoomableCanvas(canvas) {
 
                 var newWidth = canvas.width/zoom.scale,
                     newHeight = canvas.height/zoom.scale;
-                    
+
                 canvas.grid.offset.left += (width - newWidth)/2;
                 canvas.grid.offset.top += (height - newHeight)/2;
             }
         });
         keyboard.on('out', 79, {
             'onkeyhold': function (delta) {
+                var width = canvas.width/zoom.scale,
+                    height = canvas.height/zoom.scale;
                 zoomTemp = zoom.scale / (zoom.speed); // + delta) / delta;
                 if (canvas.width/zoomTemp <= Math.abs(canvas.grid.right - canvas.grid.left) &&
                     canvas.height/zoomTemp <= Math.abs(canvas.grid.bottom - canvas.grid.top)) {
                     zoom.scale = zoomTemp;
+                    var newWidth = canvas.width/zoom.scale,
+                        newHeight = canvas.height/zoom.scale;
+                    canvas.grid.offset.left += (width - newWidth)/2;
+                    canvas.grid.offset.top += (height - newHeight)/2;
+
                     var offset = canvas.width/zoom.scale + canvas.grid.offset.left;
+
+                    console.log(canvas.width/zoom.scale, offset, canvas.grid.right);
                     if (offset > canvas.grid.right) {
                         canvas.grid.offset.left = canvas.grid.right - canvas.width/zoom.scale;
+                    } else if (canvas.grid.offset.left < canvas.grid.left) {
+                        canvas.grid.offset.left = canvas.grid.left;
                     }
                     offset = canvas.height/zoom.scale + canvas.grid.offset.top;
                     if (offset > canvas.grid.bottom) {
                         canvas.grid.offset.top = canvas.grid.bottom - canvas.height/zoom.scale;
+                    } else if (canvas.grid.offset.top < canvas.grid.top) {
+                        canvas.grid.offset.top = canvas.grid.top;
                     }
                 }   
             }
